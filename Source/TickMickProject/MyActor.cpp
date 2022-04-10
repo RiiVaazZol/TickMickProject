@@ -10,7 +10,6 @@ AMyActor::AMyActor()
 	PrimaryActorTick.bCanEverTick = true;
 
 }
-//kekw
 // Called when the game starts or when spawned
 void AMyActor::BeginPlay()
 {
