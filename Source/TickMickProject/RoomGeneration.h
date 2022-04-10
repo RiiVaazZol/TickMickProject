@@ -4,23 +4,28 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "LevelGeneration.generated.h"
+#include "RoomGeneration.generated.h"
 
 UCLASS()
-class TICKMICKPROJECT_API ALevelGeneration : public AActor
+class TICKMICKPROJECT_API ARoomGeneration : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ALevelGeneration();
+	ARoomGeneration();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Room")
+	float RoomLenght;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Room")
+	float RoomWidth;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Components")
+	class UStaticMeshComponent* Room;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	
+
 };

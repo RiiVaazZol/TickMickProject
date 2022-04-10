@@ -3,6 +3,7 @@
 
 #include "LevelGeneration.h"
 
+
 // Sets default values
 ALevelGeneration::ALevelGeneration()
 {
@@ -15,6 +16,7 @@ ALevelGeneration::ALevelGeneration()
 void ALevelGeneration::BeginPlay()
 {
 	Super::BeginPlay();
+	
 	
 }
 
