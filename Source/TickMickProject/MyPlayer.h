@@ -19,27 +19,28 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	float CamSpeed=0.8f;
+	FRotator RotateCam;
+	FRotator RotateCamLast;
 	FRotator RotateMash;
 	FRotator RotateMashLast;
-	//int RotateMode=1;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Move")
-	float SpeedRotate =7.f;
-	//UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Move")
-	//float MaxSpeedRotate =500.f;
-		UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Components")
+	float SpeedRotate =7;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Components")
 	class UCapsuleComponent* CapsuleComponent;
-		UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Components")
-	class UMeshComponent* Mesh;
-		UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Components")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Components")
+	class USkeletalMeshComponent* Mesh;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Components")
 	class USpringArmComponent* CameraArm;
-		UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Components")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Components")
 	class UCameraComponent* Camera;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Components")
 	class UFloatingPawnMovement* MovementComponent;
 	void MoveRight(float Value);
 	void MoveForward(float Value);
-	void SmoothRotateMesh(FRotator Rotate, float DeltaTime);
-public:	
+	void CamRotateAxis(float Value);
+	//void CamRotate90();
+	public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

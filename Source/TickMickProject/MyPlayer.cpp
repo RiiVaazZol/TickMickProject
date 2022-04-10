@@ -13,19 +13,21 @@
 AMyPlayer::AMyPlayer()
 {
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>("Body");
-	CapsuleComponent->InitCapsuleSize(50.f, 50.0f);
+	CapsuleComponent->InitCapsuleSize(25.f, 95.0f);
 	MovementComponent = CreateDefaultSubobject<UFloatingPawnMovement>("MovementComponent");
 	MovementComponent->MaxSpeed = 900.f;
 	MovementComponent->Deceleration = 4000.f;
 	MovementComponent->TurningBoost = 1.f;
-	Mesh = CreateDefaultSubobject<UMeshComponent>("Mesh");
+	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>("Mesh");
 	Mesh->SetupAttachment(CapsuleComponent);
 	Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	Mesh->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> VisualAsset(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
+	Mesh->SetRelativeLocation(FVector(0.0f, 0.0f, -95.0f));
+	Mesh->SetRelativeRotation(FRotator(0.f,-90,0));
+	RotateMashLast = Mesh->GetRelativeRotation();
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> VisualAsset(TEXT("SkeletalMesh'/Engine/Tutorial/SubEditors/TutorialAssets/Character/TutorialTPP'"));
 	if (VisualAsset.Succeeded())
 	{
-		Mesh->SetStaticMesh(VisualAsset.Object);
+		Mesh->SetSkeletalMesh(VisualAsset.Object);
 	}
 	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MeshMat(TEXT("Material'/Engine/EditorMaterials/GridMaterial.GridMaterial'"));
 	if (MeshMat.Succeeded())
@@ -34,11 +36,13 @@ AMyPlayer::AMyPlayer()
 	}
 	CameraArm = CreateDefaultSubobject<USpringArmComponent>("CameraArm");
 	CameraArm->SetupAttachment(CapsuleComponent);
-	CameraArm->SetRelativeRotation(FRotator(-30.f,0,0));
-	CameraArm->TargetArmLength = 700.f;
+	CameraArm->SetRelativeRotation(FRotator(-55.f,0,0));
+	CameraArm->TargetArmLength = 1500.f;
+	RotateCamLast = CameraArm->GetRelativeRotation();
+	RotateCam = RotateCamLast;
 	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
 	Camera->SetupAttachment(CameraArm);
-	Camera->SetWorldRotation(FRotator(5.f,0,0));
+	Camera->SetRelativeRotation(FRotator(-1.f,0,0));
 	CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	CapsuleComponent->SetCollisionProfileName(NAME_Pawn);
 	CapsuleComponent->BodyInstance.bLockXRotation = true;
@@ -62,7 +66,13 @@ void AMyPlayer::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	if (MovementComponent->Velocity != FVector(0.0f,0.0f,0.0f) && RotateMash!=RotateMashLast)
 	{
-		SmoothRotateMesh(RotateMash,DeltaTime);
+		RotateMashLast=FMath::RInterpTo(RotateMashLast,RotateMash,DeltaTime,SpeedRotate);
+		Mesh->SetRelativeRotation(RotateMashLast);
+	}
+	if (RotateCam!=RotateCamLast)
+	{
+		RotateCamLast=FMath::RInterpTo(RotateCamLast,RotateCam,DeltaTime,SpeedRotate);
+		CameraArm->SetRelativeRotation(RotateCamLast);
 	}
 }
 
@@ -70,9 +80,14 @@ void AMyPlayer::Tick(float DeltaTime)
 void AMyPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	PlayerInputComponent->BindAxis("CamRotate", this, &AMyPlayer::CamRotateAxis);
 	PlayerInputComponent->BindAxis("MoveForward", this, &AMyPlayer::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AMyPlayer::MoveRight);
 
+}
+void AMyPlayer::CamRotateAxis(float Value)
+{
+	RotateCam.Yaw+=CamSpeed*Value; 
 }
 void AMyPlayer::MoveForward(float Value)
 {
@@ -84,7 +99,7 @@ void AMyPlayer::MoveForward(float Value)
 		// get forward vector
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		AddMovementInput(Direction, Value);
-		RotateMash = FRotator(0,MovementComponent->Velocity.Rotation().Yaw,0);
+		RotateMash = FRotator(0,MovementComponent->Velocity.Rotation().Yaw-90,0);
 	}
 }
 void AMyPlayer::MoveRight(float Value)
@@ -98,13 +113,10 @@ void AMyPlayer::MoveRight(float Value)
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
-		RotateMash = FRotator(0,MovementComponent->Velocity.Rotation().Yaw,0);
+		RotateMash = FRotator(0,MovementComponent->Velocity.Rotation().Yaw-90,0);
 	}
 	
 }
-void AMyPlayer::SmoothRotateMesh(FRotator Rotate, float DeltaTime)
-{
- RotateMashLast=FMath::RInterpTo(RotateMashLast,Rotate,DeltaTime,SpeedRotate);
-	Mesh->SetRelativeRotation(RotateMashLast);
-}
+
+
 
