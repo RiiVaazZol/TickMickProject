@@ -9,7 +9,6 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
 
-//kekw
 // Sets default values
 AMyPlayer::AMyPlayer()
 {
