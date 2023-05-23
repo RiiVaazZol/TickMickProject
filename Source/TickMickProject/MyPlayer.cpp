@@ -14,7 +14,7 @@
 AMyPlayer::AMyPlayer()
 {
 	//Контроллер персонажа
-	PlayerController = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+	//PlayerController = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
 	//Капсуль колизии
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>("Body");
 	CapsuleComponent->InitCapsuleSize(25.f, 95.0f);
@@ -65,7 +65,7 @@ AMyPlayer::AMyPlayer()
 void AMyPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-	PlayerController->bShowMouseCursor = true;
+	//PlayerController->bShowMouseCursor = true;
 }
 
 // Called every frame
@@ -76,15 +76,15 @@ void AMyPlayer::Tick(float DeltaTime)
 	//поворот мaдельки
 	if (/*MovementComponent->Velocity != FVector(0.0f,0.0f,0.0f) &&*/ RotateMash!=RotateMashLast)
 	{
-		isHit = PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, true, CursorTraceEnd);
-		FVector MouseVector = CursorTraceEnd.Location-CapsuleComponent->GetComponentLocation();
-		RotateMash=FRotator(0,MouseVector.Rotation().Yaw-90,0);
+		//isHit = PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, true, CursorTraceEnd);
+		//FVector MouseVector = CursorTraceEnd.Location-CapsuleComponent->GetComponentLocation();
+		//RotateMash=FRotator(0,MouseVector.Rotation().Yaw-90,0);
 		
-		DrawDebugLine(GetWorld(),CapsuleComponent->GetComponentLocation(),CursorTraceEnd.Location,FColor::Red);
-		GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Red, CursorTraceEnd.Location.ToString());
+		//DrawDebugLine(GetWorld(),CapsuleComponent->GetComponentLocation(),CursorTraceEnd.Location,FColor::Red);
+		//GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Red, CursorTraceEnd.Location.ToString());
 		
-		RotateMashLast=FMath::RInterpTo(RotateMashLast,RotateMash,DeltaTime,SpeedRotate);
-		Mesh->SetRelativeRotation(RotateMashLast);
+		//RotateMashLast=FMath::RInterpTo(RotateMashLast,RotateMash,DeltaTime,SpeedRotate);
+		//Mesh->SetRelativeRotation(RotateMashLast);
 	}
 	//поворот камеры
 	if (RotateCam!=RotateCamLast)

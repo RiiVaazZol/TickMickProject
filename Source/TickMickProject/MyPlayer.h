@@ -42,7 +42,7 @@ protected:
 	class UCameraComponent* Camera;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Components")
 	class UFloatingPawnMovement* MovementComponent;
-	//UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Components")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Components")
 	class APlayerController* PlayerController;
 	void MoveRight(float Value);
 	void MoveForward(float Value);
