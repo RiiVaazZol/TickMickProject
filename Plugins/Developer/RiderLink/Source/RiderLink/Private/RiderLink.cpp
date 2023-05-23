@@ -3,6 +3,7 @@
 #include "ProtocolFactory.h"
 #include "UE4Library/UE4Library.Generated.h"
 
+#include "Async/Async.h"
 #include "Misc/App.h"
 #include "Misc/ScopeRWLock.h"
 #include "Modules/ModuleManager.h"
@@ -25,6 +26,7 @@ static FString GetProjectName()
 void FRiderLinkModule::ShutdownModule()
 {
 	UE_LOG(FLogRiderLinkModule, Verbose, TEXT("RiderLink SHUTDOWN START"));
+	
 	ModuleLifetimeDef.terminate();
 	ProtocolFactory.Reset();
 	UE_LOG(FLogRiderLinkModule, Verbose, TEXT("RiderLink SHUTDOWN FINISH"));
@@ -33,6 +35,7 @@ void FRiderLinkModule::ShutdownModule()
 void FRiderLinkModule::StartupModule()
 {
 	UE_LOG(FLogRiderLinkModule, Verbose, TEXT("RiderLink STARTUP START"));
+	
 	ProtocolFactory = MakeUnique<class ProtocolFactory>(GetProjectName());
 	Scheduler.queue([this]()
 	{
@@ -83,7 +86,10 @@ void FRiderLinkModule::InitProtocol()
 			FString projectName = GetProjectName();
 			FString executableName = FPlatformProcess::ExecutableName(false);
 			uint32_t pid = FPlatformProcess::GetCurrentProcessId();
-			auto connectionInfo = JetBrains::EditorPlugin::ConnectionInfo(*projectName, *executableName, pid);
+			
+			std::wstring projectNameWstr = TCHAR_TO_WCHAR(GetData(projectName));
+			std::wstring executableNameWstr = TCHAR_TO_WCHAR(GetData(executableName));
+			auto connectionInfo = JetBrains::EditorPlugin::ConnectionInfo(projectNameWstr, executableNameWstr, pid);
 			EditorModel->get_connectionInfo().set(connectionInfo);
 		});
 	});
@@ -103,6 +109,16 @@ void FRiderLinkModule::ViewModel(rd::Lifetime Lifetime,
 		{
 			if (Cond) Handler(ModelLifetime, *EditorModel.Get());
 		});
+	});
+}
+
+void FRiderLinkModule::QueueModelAction(TFunction<void(JetBrains::EditorPlugin::RdEditorModel const&)> Handler)
+{	
+	Scheduler.invoke_or_queue([this, Handler]
+	{
+		if(!RdIsModelAlive.has_value() || !RdIsModelAlive.get()) return;
+		
+		Handler(*EditorModel.Get());
 	});
 }
 
